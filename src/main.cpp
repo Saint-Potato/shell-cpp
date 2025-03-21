@@ -1,8 +1,59 @@
 #include <iostream>
+#include<string>
+#include<sstream>
+#include<vector>
+
 using namespace std;
 
-void invalidCommand(string input) {
+string trim(string str) {
+    while (!str.empty() && isspace(str.front())) str.erase(0, 1);  // Remove leading spaces
+    while (!str.empty() && isspace(str.back())) str.pop_back();   // Remove trailing spaces
+    return str;
+}
+
+vector<string> split(const string& str) {
+    vector<string> words;
+    istringstream iss(str);
+    string word;
+
+    while (iss >> word) {  // Extract words separated by spaces
+        words.push_back(word);
+    }
+
+    return words;
+}
+
+void invalidCommand(string input){
 	cout << input << ": command not found" << std ::endl;
+}
+
+int inputParser(string input){
+	input = trim(input);
+	vector<string> input_split = split(input);
+	if(input_split[0] == "exit"){
+		if(input_split[1] == "0" && input_split.size() == 2){
+			return 0;
+		}
+		else {
+			return -1;
+		}
+	}
+	else{
+		return -1;
+	}
+}
+
+bool processCommand(int command, string input){
+	switch (command) {
+		case -1:
+			invalidCommand(input);
+			return true;
+		case 0:
+			return false;   // exit command
+		default:
+			invalidCommand(input);
+			return true;
+	}
 }
 
 void REPL(){
@@ -10,7 +61,12 @@ void REPL(){
 		string input;
 		cout << "$ ";
 		getline(std::cin, input);
-		invalidCommand(input);
+		int command = inputParser(input);;
+		bool response = processCommand(command, input);
+		if(!response){
+			break;
+		}
+		
 	}
 }
 
@@ -22,4 +78,6 @@ int main() {
   // Uncomment this block to pass the first stage
 
 	REPL();
+
+	return 0;
 }
