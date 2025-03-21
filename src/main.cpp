@@ -23,8 +23,12 @@ vector<string> split(const string& str) {
     return words;
 }
 
-void invalidCommand(string input){
+void commandInvalid(string input){
 	cout << input << ": command not found" << std ::endl;
+}
+
+void commandEcho(string input){
+	cout << input.substr(5, input.length() - 5) << endl;
 }
 
 int inputParser(string input){
@@ -38,6 +42,9 @@ int inputParser(string input){
 			return -1;
 		}
 	}
+	else if(input_split[0] == "echo"){
+		return 1;
+	}
 	else{
 		return -1;
 	}
@@ -46,12 +53,15 @@ int inputParser(string input){
 bool processCommand(int command, string input){
 	switch (command) {
 		case -1:
-			invalidCommand(input);
+			commandInvalid(input);
 			return true;
 		case 0:
 			return false;   // exit command
+		case 1:
+			commandEcho(input);
+			return true;
 		default:
-			invalidCommand(input);
+			commandInvalid(input);
 			return true;
 	}
 }
