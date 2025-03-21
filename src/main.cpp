@@ -1,4 +1,9 @@
 #include <iostream>
+using namespace std;
+
+void invalidCommand(string input){
+  cout<<input<<": command not found"<<std :: endl;
+}
 
 int main() {
   // Flush after every std::cout / std:cerr
@@ -11,5 +16,5 @@ int main() {
   std::string input;
   std::getline(std::cin, input);
 
-  std::cout<<input<<": command not found"<<std :: endl;
+  invalidCommand(input);
 }
