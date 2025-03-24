@@ -1,9 +1,13 @@
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
 using namespace std;
+namespace fs = std::filesystem;
+
+const char *PATH = getenv("PATH");
 
 string trim(string str) {
   while (!str.empty() && isspace(str.front()))
@@ -33,20 +37,51 @@ void commandEcho(string input) {
   cout << input.substr(5, input.length() - 5) << endl;
 }
 
+string checkPATH(string command) {
+  stringstream ss(PATH);
+  string dir;
+  char delimiter = (fs::path::preferred_separator == '/') ? ':' : ';';  // assigns delimiter based on OS
+
+  while (getline(ss, dir, delimiter)) {
+    fs::path full_path = fs::path(dir) / command;
+
+    if constexpr (fs::path::preferred_separator == '\\') {         // checks for .exe files in Windows OS
+      if (fs::exists(full_path) || fs::exists(full_path.string() + ".exe")) {
+        return full_path.string();
+      }
+    } else {
+      if (fs::exists(full_path) && fs::is_regular_file(full_path)) {
+        return full_path.string();
+      }
+    }
+  }
+
+  return "";
+}
+
 void commandType(string input) {
   vector<string> input_split = split(input);
   vector<string> command_list = {"type", "echo", "exit"};
 
-  bool valid_command = false;
+  bool shell_builtin = false;
 
-  for (string command : command_list) {
-    if (input_split[1] == command) {
-      valid_command = true;
+  string command = input_split[1];
+  for (string it : command_list) {
+    if (command == it) {
+		shell_builtin = true;
     }
   }
 
-  if (valid_command) {
-    cout << input_split[1] << " is a shell builtin" << endl;
+  if (!shell_builtin) {
+    string file_path = checkPATH(command);
+	if(!file_path.empty()){
+		cout << command << " is " << file_path << endl;
+		return;
+	}
+  }
+
+  if (shell_builtin) {
+    cout << command << " is a shell builtin" << endl;
   } else {
     cout << input.substr(5, input.length() - 5) << ": not found" << endl;
   }
