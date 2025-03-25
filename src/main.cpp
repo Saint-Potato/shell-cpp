@@ -48,6 +48,10 @@ void commandPATHExecutable(string input){
 	
 }
 
+void commandPWD(){
+	cout << fs::current_path().string() << endl;
+}
+
 string checkPATH(string command) {
   stringstream ss(PATH);
   string dir;
@@ -72,7 +76,7 @@ string checkPATH(string command) {
 
 void commandType(string input) {
   vector<string> input_split = split(input);
-  vector<string> command_list = {"type", "echo", "exit"};
+  vector<string> command_list = {"type", "echo", "exit", "pwd"};
 
   bool shell_builtin = false;
 
@@ -113,6 +117,8 @@ int inputParser(string input) {
     return 2;
   } else if(checkPATH(input_split[0]) != ""){
 	return 3;
+  } else if(input_split[0] == "pwd"){
+	return 4;
   } else {
     return -1;
   }
@@ -133,6 +139,9 @@ bool processCommand(int command, string input) {
     return true;
   case 3:
 	commandPATHExecutable(input);
+	return true;
+  case 4:
+    commandPWD();
 	return true;
 
   default:
