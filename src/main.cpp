@@ -38,7 +38,31 @@ void commandInvalid(string input) {
 }
 
 void commandEcho(string input) {
-  cout << input.substr(5, input.length() - 5) << endl;
+	vector<string> input_split = split(input);
+	if(input_split[1][0] == '\''){
+		int start_index =  0;
+		while(start_index < input.size() - 1){
+			start_index = input.find("\'", start_index) + 1;
+			while(input[start_index] != '\''){
+				cout << input[start_index];
+				start_index++;
+			}
+			start_index++;
+			if(input[start_index] != '\''){
+				cout << " ";
+			}
+			
+			
+		}
+		
+		cout << endl;
+	}
+	else{
+		for(int i = 1; i < input_split.size(); i++){
+			cout << input_split[i] << " ";
+		}
+		cout << endl;
+	}
 }
 
 void commandPATHExecutable(string input){
