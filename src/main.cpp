@@ -5,11 +5,13 @@
 #include <string>
 #include <vector>
 #include<cstdlib>
+#include <unistd.h>
 
 using namespace std;
 namespace fs = std::filesystem;
 
 const char *PATH = getenv("PATH");
+string cwd = fs::current_path().string();
 
 string trim(string str) {
   while (!str.empty() && isspace(str.front()))
@@ -49,7 +51,29 @@ void commandPATHExecutable(string input){
 }
 
 void commandPWD(){
-	cout << fs::current_path().string() << endl;
+	cout << cwd << endl;
+}
+
+void commandCD(string input){
+	vector<string> input_split = split(input);
+	string dir_path = input_split[1];
+	fs :: path p = dir_path;
+	fs :: path p2 = filesystem::current_path() / p;
+	fs :: path target_path = fs :: absolute(dir_path);
+	if(dir_path == "~"){
+		target_path = getenv("HOME");
+		if(chdir(target_path.c_str()) == 0){
+			cwd = fs :: current_path().string();
+		}
+	}
+	else if(exists(target_path)){
+		if(chdir(target_path.c_str()) == 0){
+			cwd = fs :: current_path().string();
+		}
+	}
+	else{
+		cout << "cd: " << dir_path << ": No such file or directory" << endl;
+	}
 }
 
 string checkPATH(string command) {
@@ -76,7 +100,7 @@ string checkPATH(string command) {
 
 void commandType(string input) {
   vector<string> input_split = split(input);
-  vector<string> command_list = {"type", "echo", "exit", "pwd"};
+  vector<string> command_list = {"type", "echo", "exit", "pwd", "cd"};
 
   bool shell_builtin = false;
 
@@ -119,7 +143,9 @@ int inputParser(string input) {
 	return 3;
   } else if(input_split[0] == "pwd"){
 	return 4;
-  } else {
+  } else if(input_split[0] == "cd"){
+	return 5;
+  }else {
     return -1;
   }
 }
@@ -142,6 +168,9 @@ bool processCommand(int command, string input) {
 	return true;
   case 4:
     commandPWD();
+	return true;
+  case 5:
+	commandCD(input);
 	return true;
 
   default:
