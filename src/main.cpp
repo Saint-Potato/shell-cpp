@@ -1,8 +1,10 @@
+#include <exception>
 #include <filesystem>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
+#include<cstdlib>
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -35,6 +37,15 @@ void commandInvalid(string input) {
 
 void commandEcho(string input) {
   cout << input.substr(5, input.length() - 5) << endl;
+}
+
+void commandPATHExecutable(string input){
+	try {
+		int result = system(input.c_str());
+	} catch (exception) {
+		return;
+	}
+	
 }
 
 string checkPATH(string command) {
@@ -100,6 +111,8 @@ int inputParser(string input) {
     return 1;
   } else if (input_split[0] == "type") {
     return 2;
+  } else if(checkPATH(input_split[0]) != ""){
+	return 3;
   } else {
     return -1;
   }
@@ -118,6 +131,9 @@ bool processCommand(int command, string input) {
   case 2:
     commandType(input);
     return true;
+  case 3:
+	commandPATHExecutable(input);
+	return true;
 
   default:
     commandInvalid(input);
